@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rust-api
+spec:
+  selector:
+    matchLabels:
+      app: rust-api
+  template:
+    metadata:
+      labels:
+        app: rust-api
+    spec:
+      containers:
+        - name: rust-api
+          image: docker.io/kind/rust-api:latest
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DATABASE_URL
+              value: "postgres://app:B3pfzQDJhFgKM6B4XTJ9bs1RPlPLsrD9RJZkVphBdsjlCapR29OAgIEZ7MuYc3bu@cluster-with-metrics-rw.default.svc.cluster.local:5432/app?sslmode=disable"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rust-api-service
+spec:
+  selector:
+    app: rust-api
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: rust-api-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: rust-api
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 50
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rust-api-ingress
+spec:
+  rules:
+    - host: rust-api.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rust-api-service
+                port:
+                  number: 80
+  ingressClassName: nginx

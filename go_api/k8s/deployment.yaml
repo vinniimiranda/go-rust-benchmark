@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-api
+  template:
+    metadata:
+      labels:
+        app: go-api
+    spec:
+      containers:
+        - name: go-api
+          image: docker.io/kind/go-api:latest
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DB_USER
+              value: "app"
+            - name: DB_PASSWORD
+              value: "B3pfzQDJhFgKM6B4XTJ9bs1RPlPLsrD9RJZkVphBdsjlCapR29OAgIEZ7MuYc3bu"
+            - name: DB_NAME
+              value: "app"
+            - name: DB_HOST
+              value: "cluster-with-metrics-rw.default.svc.cluster.local"
+            - name: DB_PORT
+              value: "5432"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-api-service
+spec:
+  selector:
+    app: go-api
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: go-api-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: go-api
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 50
+  behavior:
+    scaleDown:
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: go-api-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/limit-rps: "1200"
+
+spec:
+  rules:
+    - host: go-api.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: go-api-service
+                port:
+                  number: 80
+  ingressClassName: nginx

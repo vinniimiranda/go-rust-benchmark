@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  go-api:
+    build:
+      context: ./go_api
+      dockerfile: Dockerfile
+    ports:
+      - "7070:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"    # Máximo de 2 CPUs
+          memory: 1024M   # Máximo de 256 MB de memória
+        reservations:
+          cpus: "2"    # Reserva garantida de 2 CPUs
+          memory: 1024M 
+    
+  rust-api:
+    build:
+      context: ./rust_api
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"    # Máximo de 2 CPUs
+          memory: 1024M   # Máximo de 256 MB de memória
+        reservations:
+          cpus: "2"    # Reserva garantida de 0.5 CPUs
+          memory: 1024M 
+    environment:
+      - DATABASE_URL=postgres://app:B3pfzQDJhFgKM6B4XTJ9bs1RPlPLsrD9RJZkVphBdsjlCapR29OAgIEZ7MuYc3bu@host.docker.internal:5432/app?sslmode=disable
