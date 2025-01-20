@@ -2,6 +2,8 @@ version: '3.8'
 
 services:
   go-api:
+    depends_on:
+      - postgres
     build:
       context: ./go_api
       dockerfile: Dockerfile
@@ -10,13 +12,16 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"    # Máximo de 2 CPUs
-          memory: 1024M   # Máximo de 256 MB de memória
+          cpus: "2"    
+          memory: 1024M   
         reservations:
-          cpus: "2"    # Reserva garantida de 2 CPUs
+          cpus: "2"    
           memory: 1024M 
     
   rust-api:
+    depends_on:
+      - postgres
+    restart: always
     build:
       context: ./rust_api
       dockerfile: Dockerfile
@@ -25,10 +30,41 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"    # Máximo de 2 CPUs
-          memory: 1024M   # Máximo de 256 MB de memória
+          cpus: "2"    
+          memory: 1024M   
         reservations:
-          cpus: "2"    # Reserva garantida de 0.5 CPUs
+          cpus: "2"    
           memory: 1024M 
     environment:
       - DATABASE_URL=postgres://app:B3pfzQDJhFgKM6B4XTJ9bs1RPlPLsrD9RJZkVphBdsjlCapR29OAgIEZ7MuYc3bu@host.docker.internal:5432/app?sslmode=disable
+  node-api:
+    depends_on:
+      - postgres
+    build:
+      context: ./node_api
+      dockerfile: Dockerfile
+    ports:
+      - "3333:3333"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"    
+          memory: 1024M   
+        reservations:
+          cpus: "2"    
+          memory: 1024M
+    environment:
+      - DB_NAME=app
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5432
+      - DB_USER=app
+      - DB_PASSWORD=B3pfzQDJhFgKM6B4XTJ9bs1RPlPLsrD9RJZkVphBdsjlCapR29OAgIEZ7MuYc3bu
+    
+  postgres:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: B3pfzQDJhFgKM6B4XTJ9bs1RPlPLsrD9RJZkVphBdsjlCapR29OAgIEZ7MuYc3bu
+      POSTGRES_DB: app
