@@ -12,13 +12,13 @@ export let options = {
   stages: [
     { duration: '10s', target: 50 },
     { duration: '20s', target: 100 },
-    // { duration: '30s', target: 500 },
-    // { duration: '60s', target: 800 },
-    // { duration: '2m', target: 1200 },
-    // { duration: '2m', target: 1500 },
-    // { duration: '2m', target: 2000 },
-    // { duration: '1m', target: 4000 },
-    // { duration: '1m', target: 5000 },
+    { duration: '30s', target: 500 },
+    { duration: '60s', target: 800 },
+    { duration: '2m', target: 1200 },
+    { duration: '2m', target: 1500 },
+    { duration: '2m', target: 2000 },
+    { duration: '1m', target: 4000 },
+    { duration: '1m', target: 5000 },
   ],
 };
 
