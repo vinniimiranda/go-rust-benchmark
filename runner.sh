@@ -37,7 +37,7 @@ echo "FINISHED RUST LOAD TEST"
 sleep 10
 
 
-# GO k6 load test
+# # GO k6 load test
 echo "STARTING GO LOAD TEST"
 monitor_docker_stats "go-api" "./results/go_docker_stats.md" &
 k6 run load_test/load_test_go.js >> ./results/go_k6_results.txt
@@ -48,10 +48,32 @@ echo "FINISHED GO LOAD TEST"
 sleep 10
 
 
-NODE k6 load test
-echo "STARTING NODE LOAD TEST"
-monitor_docker_stats "node-api" "./results/node_docker_stats.md" &
-k6 run load_test/load_test_node.js >> ./results/node_k6_results.txt
-awk '/status é/,/running/' ./results/node_k6_results.txt > ./results/node_k6_results_metrics.txt
-wait
-echo "FINISHED NODE LOAD TEST"
+# NODE k6 load test
+# echo "STARTING NODE LOAD TEST"
+# monitor_docker_stats "node-api" "./results/node_docker_stats.md" &
+# k6 run load_test/load_test_node.js >> ./results/node_k6_results.txt
+# awk '/status é/,/running/' ./results/node_k6_results.txt > ./results/node_k6_results_metrics.txt
+# wait
+# echo "FINISHED NODE LOAD TEST"
+
+
+# Write final results file
+echo "# Final Results for execution" > ./results/results.md
+echo "## RUST" >> ./results/results.md
+echo '### K6' >> ./results/results.md
+echo "\`\`\`rust" >> ./results/results.md
+cat ./results/rust_k6_results_metrics.txt >> ./results/results.md
+echo "\`\`\`" >> ./results/results.md
+echo '### Metrics' >> ./results/results.md
+cat ./results/rust_docker_stats.md >> ./results/results.md
+echo "\n\n\n" >> ./results/results.md
+
+echo "## GO" >> ./results/results.md
+echo '### K6' >> ./results/results.md
+echo "\`\`\`go" >> ./results/results.md
+cat ./results/go_k6_results_metrics.txt >> ./results/results.md
+echo "\`\`\`" >> ./results/results.md
+echo '### Metrics' >> ./results/results.md
+cat ./results/go_docker_stats.md >> ./results/results.md
+echo "\n\n"
+
