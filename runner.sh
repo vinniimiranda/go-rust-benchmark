@@ -36,14 +36,6 @@ wait
 echo "FINISHED RUST LOAD TEST"
 sleep 10
 
-# NODE k6 load test
-echo "STARTING NODE LOAD TEST"
-monitor_docker_stats "node-api" "./results/node_docker_stats.md" &
-k6 run load_test/load_test_node.js >> ./results/node_k6_results.txt
-awk '/status é/,/running/' ./results/node_k6_results.txt > ./results/node_k6_results_metrics.txt
-wait
-echo "FINISHED NODE LOAD TEST"
-sleep 10
 
 # GO k6 load test
 echo "STARTING GO LOAD TEST"
@@ -52,3 +44,14 @@ k6 run load_test/load_test_go.js >> ./results/go_k6_results.txt
 awk '/status é/,/running/' ./results/go_k6_results.txt > ./results/go_k6_results_metrics.txt
 wait
 echo "FINISHED GO LOAD TEST"
+
+sleep 10
+
+
+NODE k6 load test
+echo "STARTING NODE LOAD TEST"
+monitor_docker_stats "node-api" "./results/node_docker_stats.md" &
+k6 run load_test/load_test_node.js >> ./results/node_k6_results.txt
+awk '/status é/,/running/' ./results/node_k6_results.txt > ./results/node_k6_results_metrics.txt
+wait
+echo "FINISHED NODE LOAD TEST"

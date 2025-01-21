@@ -9,6 +9,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "7070:8080"
+    environment:
+      - DB_NAME=app
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5432
+      - DB_USER=app
+      - DB_PASSWORD=B3pfzQDJhFgKM6B4XTJ9bs1RPlPLsrD9RJZkVphBdsjlCapR29OAgIEZ7MuYc3bu
     deploy:
       resources:
         limits:
