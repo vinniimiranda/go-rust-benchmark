@@ -66,7 +66,7 @@ func connectDB(config Config) (*sql.DB, error) {
 	}
 
 	db.SetMaxIdleConns(5) // Pool de conex o com 50 clientes
-	db.SetMaxOpenConns(10)
+	db.SetMaxOpenConns(50)
 
 	return db, nil
 }

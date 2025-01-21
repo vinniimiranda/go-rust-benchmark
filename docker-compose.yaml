@@ -74,3 +74,11 @@ services:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: B3pfzQDJhFgKM6B4XTJ9bs1RPlPLsrD9RJZkVphBdsjlCapR29OAgIEZ7MuYc3bu
       POSTGRES_DB: app
+    deploy:
+      resources:
+        limits:
+          cpus: "2"    
+          memory: 2048M   
+        reservations:
+          cpus: "2"    
+          memory: 2048M
